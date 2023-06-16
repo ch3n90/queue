@@ -18,9 +18,7 @@ public abstract class TimerTask implements Runnable{
     @Override
     public void run() {
         this.status = TimerTaskStatus.RUNNING;
-
         d0();
-
         this.status = TimerTaskStatus.TERMINATION;
     }
 

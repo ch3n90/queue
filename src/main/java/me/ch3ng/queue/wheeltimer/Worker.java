@@ -31,13 +31,13 @@ public class Worker implements Runnable{
         this.timeUnit = timeUnit;
         this.bucketSize = bucketSize;
         this.status = WheelTimerStatus.INIT;
+
     }
 
     @Override
     public void run() {
-
         this.status = WheelTimerStatus.RUNNING;
-        System.out.println("--------------");
+
         do {
             waitForNextTick();
             int idx = (int) (tick % bucketSize);
@@ -71,7 +71,7 @@ public class Worker implements Runnable{
 
             try {
                 Thread.sleep(sleepTimeMs);
-                System.out.println("wheel timer point mov ---> " + this.tick + " ----> " + sleepTimeMs);
+//                System.out.println("wheel timer point mov ---> " + this.tick + " ----> " + sleepTimeMs);
             } catch (InterruptedException e) {
                 e.fillInStackTrace();
             }
@@ -79,8 +79,8 @@ public class Worker implements Runnable{
     }
 
     protected void stop(){
-        System.out.println(Thread.currentThread());
         this.status = WheelTimerStatus.SHUTDOWN;
+        executorService.shutdownNow();
     }
 
     protected int currentBucketIdx(){

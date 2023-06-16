@@ -12,7 +12,7 @@ public class WheelTimerTest {
     @Test
     public void test()  {
 
-        WheelTimer wheelTimer = new WheelTimer(2,12, TimeUnit.SECONDS);
+        WheelTimer wheelTimer = new WheelTimer(1,12, TimeUnit.SECONDS);
 
         TimerTask timeout = new TimerTask() {
             @Override
@@ -22,7 +22,7 @@ public class WheelTimerTest {
         };
 
 
-        wheelTimer.newTimerTask(5, TimeUnit.SECONDS,timeout);
+        wheelTimer.newTimerTask(6, TimeUnit.SECONDS,timeout);
         wheelTimer.newTimerTask(8, TimeUnit.SECONDS, new TimerTask() {
             @Override
             public void d0() {

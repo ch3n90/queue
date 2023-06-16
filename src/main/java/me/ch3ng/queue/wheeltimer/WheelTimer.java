@@ -77,21 +77,26 @@ public class WheelTimer {
 
         //计算bucket索引
         //从当前时针所在位置开始计算延迟后索引位置
-        int idx = worker.currentBucketIdx();
         long tickDurationNanos = this.timeUnit.toNanos(this.tickDuration);
-        delayNanos = delayNanos - (this.bucketSize - idx + 1) * this.tickDuration;
+        //当前时间轮指针位置
+        int idx = worker.currentBucketIdx();
+        long slotMod = delayNanos % tickDurationNanos;
+        int needSlot = (int)(slotMod == 0 ? delayNanos / tickDurationNanos : delayNanos / tickDurationNanos + 1);
+        //剩余slot的数量
+        int hasSlot = this.bucketSize - idx;
+        int bucketIdx;
+        if(hasSlot >= needSlot){
+            bucketIdx = needSlot - 1;
+        } else {
+            bucketIdx = (needSlot - hasSlot) % this.bucketSize - 1;
+        }
 
-        long bucketIdx = (delayNanos % wheelTimerDurationNanos) / tickDurationNanos;
-        bucketIdx = bucketIdx == 0 ? bucketIdx : bucketIdx + 1;
-
-        int bucketIdxOfInt = (int) bucketIdx;
-
-        timeout.bucketIdx = bucketIdxOfInt;
+        timeout.bucketIdx = bucketIdx;
         timeout.round = round;
         timeout.status = TimerTaskStatus.PENDING;
 
         //命中 wheelBucket
-        WheelBucket wheelBucket = this.wheelBuckets[bucketIdxOfInt];
+        WheelBucket wheelBucket = this.wheelBuckets[bucketIdx];
         wheelBucket.push(timeout);
     }
 
