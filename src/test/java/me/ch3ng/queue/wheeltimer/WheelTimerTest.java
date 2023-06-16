@@ -14,22 +14,26 @@ public class WheelTimerTest {
 
         WheelTimer wheelTimer = new WheelTimer(1,12, TimeUnit.SECONDS);
 
-        TimerTask timeout = new TimerTask() {
+
+        wheelTimer.newTimerTask(6, TimeUnit.SECONDS,new TimerTask() {
             @Override
             public void d0() {
-                System.out.println("5秒时间到了，开始执行");
+                System.out.println("6秒时间到了，开始执行");
             }
-        };
-
-
-        wheelTimer.newTimerTask(6, TimeUnit.SECONDS,timeout);
+        });
         wheelTimer.newTimerTask(8, TimeUnit.SECONDS, new TimerTask() {
             @Override
             public void d0() {
-                wheelTimer.stop();
+                System.out.println("8秒时间到了，开始执行");
             }
         });
 
+        wheelTimer.newTimerTask(10, TimeUnit.SECONDS, new TimerTask() {
+            @Override
+            public void d0() {
+               wheelTimer.stop();
+            }
+        });
 
         wheelTimer.start();
         try {

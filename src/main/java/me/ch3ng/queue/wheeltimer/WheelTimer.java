@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class WheelTimer {
 
+
     /**
      * the wheel bucket time
      */
@@ -70,37 +71,9 @@ public class WheelTimer {
         this.worker.stop();
     }
 
-    public void newTimerTask(long delay,TimeUnit delayTimeUnit,TimerTask timeout){
+    public void newTimerTask(long delay,TimeUnit delayTimeUnit,TimerTask timerTask){
 
-        long delayNanos = delayTimeUnit.toNanos(delay);
-        long wheelTimerDurationNanos = this.timeUnit.toNanos(this.wheelDuration);
-
-        //计算时间轮round层数
-        long round = delayNanos / wheelTimerDurationNanos;
-
-        //计算bucket索引
-        //从当前时针所在位置开始计算延迟后索引位置
-        long tickDurationNanos = this.timeUnit.toNanos(this.tickDuration);
-        //当前时间轮指针位置
-        int idx = worker.currentBucketIdx();
-        long slotMod = delayNanos % tickDurationNanos;
-        int needSlot = (int)(slotMod == 0 ? delayNanos / tickDurationNanos : delayNanos / tickDurationNanos + 1);
-        //剩余slot的数量
-        int hasSlot = this.bucketSize - idx;
-        int bucketIdx;
-        if(hasSlot >= needSlot){
-            bucketIdx = needSlot - 1;
-        } else {
-            bucketIdx = (needSlot - hasSlot) % this.bucketSize - 1;
-        }
-
-        timeout.bucketIdx = bucketIdx;
-        timeout.round = round;
-        timeout.status = TimerTaskStatus.PENDING;
-
-        //命中 wheelBucket
-        WheelBucket wheelBucket = this.wheelBuckets[bucketIdx];
-        wheelBucket.push(timeout);
+        this.worker.addTask(delay,delayTimeUnit,timerTask);
 
         if(State.NEW == workerThread.getState()){
             this.workerThread.start();
