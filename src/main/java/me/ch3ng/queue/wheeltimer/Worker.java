@@ -51,7 +51,6 @@ public class Worker implements Runnable{
             List<TimerTask> timeouts = wheelBucket.poll();
 
             timeouts.forEach(timeout -> executorService.execute(timeout));
-
             tick++;
 
         }while (this.status == WheelTimerStatus.RUNNING);
@@ -59,6 +58,8 @@ public class Worker implements Runnable{
     }
 
     private void waitForNextTick() {
+        //TODO 如果时间轮中的任务非常少，或者跨度非常大，那么此时时间轮会进行空转浪费性能
+        //TODO 针对这种情况可以阻塞该进程，释放cpu执行权，直到任务临近时，唤醒该进程，触发内核运行
         long deadline = timeUnit.toNanos(tickDuration) * (tick + 1);
 
         for (;;) {

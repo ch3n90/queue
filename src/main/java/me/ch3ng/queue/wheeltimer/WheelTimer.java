@@ -1,5 +1,6 @@
 package me.ch3ng.queue.wheeltimer;
 
+import java.lang.Thread.State;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -60,7 +61,9 @@ public class WheelTimer {
     }
 
     public void start(){
-        this.workerThread.start();
+        if(State.NEW == this.workerThread.getState()){
+            this.workerThread.start();
+        }
     }
 
     public void stop(){
@@ -98,6 +101,10 @@ public class WheelTimer {
         //命中 wheelBucket
         WheelBucket wheelBucket = this.wheelBuckets[bucketIdx];
         wheelBucket.push(timeout);
+
+        if(State.NEW == workerThread.getState()){
+            this.workerThread.start();
+        }
     }
 
 
