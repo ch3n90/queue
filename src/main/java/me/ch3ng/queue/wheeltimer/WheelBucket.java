@@ -12,18 +12,24 @@ import java.util.stream.Collectors;
 public class WheelBucket {
 
 
-    private List<Timeout> timeouts = new LinkedList<>();
+    private List<TimerTask> timerTasks = new LinkedList<>();
 
 
-    public void push(Timeout timeout){
-        this.timeouts.add(timeout);
+    protected void push(TimerTask timeout){
+        this.timerTasks.add(timeout);
     }
 
 
-    public List<Timeout> poll(){
-        List<Timeout> collect = timeouts.stream().filter(timeout -> timeout.round == 0).collect(Collectors.toList());
-        timeouts.removeAll(collect);
-        timeouts.forEach(timeout -> timeout.round--);
+    protected List<TimerTask> poll(){
+        List<TimerTask> collect = timerTasks.stream().filter(timeout -> timeout.round == 0).collect(Collectors.toList());
+        timerTasks.removeAll(collect);
+        timerTasks.forEach(timeout -> timeout.round--);
+        return collect;
+    }
+
+    protected List<TimerTask> processCanceledTimerTask(){
+        List<TimerTask> collect = timerTasks.stream().filter(timeout -> timeout.status == TimerTaskStatus.CANCELED).collect(Collectors.toList());
+        timerTasks.removeAll(collect);
         return collect;
     }
 

@@ -14,10 +14,19 @@ public class WheelTimerTest {
 
         WheelTimer wheelTimer = new WheelTimer(2,12, TimeUnit.SECONDS);
 
-        wheelTimer.newTimeout(26, TimeUnit.SECONDS, new Timeout() {
+        TimerTask timeout = new TimerTask() {
             @Override
-            public void run() {
-                System.out.println("延迟26s后执行了");
+            public void d0() {
+                System.out.println("5秒时间到了，开始执行");
+            }
+        };
+
+
+        wheelTimer.newTimerTask(5, TimeUnit.SECONDS,timeout);
+        wheelTimer.newTimerTask(8, TimeUnit.SECONDS, new TimerTask() {
+            @Override
+            public void d0() {
+                wheelTimer.stop();
             }
         });
 

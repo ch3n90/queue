@@ -67,7 +67,7 @@ public class WheelTimer {
         this.worker.stop();
     }
 
-    public void newTimeout(long delay,TimeUnit delayTimeUnit,Timeout timeout){
+    public void newTimerTask(long delay,TimeUnit delayTimeUnit,TimerTask timeout){
 
         long delayNanos = delayTimeUnit.toNanos(delay);
         long wheelTimerDurationNanos = this.timeUnit.toNanos(this.wheelDuration);
@@ -76,7 +76,10 @@ public class WheelTimer {
         long round = delayNanos / wheelTimerDurationNanos;
 
         //计算bucket索引
+        //从当前时针所在位置开始计算延迟后索引位置
+        int idx = worker.currentBucketIdx();
         long tickDurationNanos = this.timeUnit.toNanos(this.tickDuration);
+        delayNanos = delayNanos - (this.bucketSize - idx + 1) * this.tickDuration;
 
         long bucketIdx = (delayNanos % wheelTimerDurationNanos) / tickDurationNanos;
         bucketIdx = bucketIdx == 0 ? bucketIdx : bucketIdx + 1;
@@ -85,6 +88,7 @@ public class WheelTimer {
 
         timeout.bucketIdx = bucketIdxOfInt;
         timeout.round = round;
+        timeout.status = TimerTaskStatus.PENDING;
 
         //命中 wheelBucket
         WheelBucket wheelBucket = this.wheelBuckets[bucketIdxOfInt];

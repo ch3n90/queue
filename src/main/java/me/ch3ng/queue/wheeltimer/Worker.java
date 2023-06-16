@@ -37,13 +37,19 @@ public class Worker implements Runnable{
     public void run() {
 
         this.status = WheelTimerStatus.RUNNING;
-
+        System.out.println("--------------");
         do {
             waitForNextTick();
             int idx = (int) (tick % bucketSize);
             //get timeout task from wheel bucket
             WheelBucket wheelBucket = wheelBuckets[idx];
-            List<Timeout> timeouts = wheelBucket.poll();
+
+            // process got canceled timeout
+            List<TimerTask> canceledTimerTask = wheelBucket.processCanceledTimerTask();
+
+            //process timeout task
+            List<TimerTask> timeouts = wheelBucket.poll();
+
             timeouts.forEach(timeout -> executorService.execute(timeout));
 
             tick++;
@@ -73,7 +79,11 @@ public class Worker implements Runnable{
     }
 
     protected void stop(){
+        System.out.println(Thread.currentThread());
         this.status = WheelTimerStatus.SHUTDOWN;
     }
 
+    protected int currentBucketIdx(){
+        return (int) (tick % bucketSize);
+    }
 }
